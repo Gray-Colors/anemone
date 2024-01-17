@@ -1,5 +1,5 @@
 
-CFLAGS = -std=c17 -O2
+CFLAGS = -std=c17 -O2 #-ANEMONE_PLATFORM_LINUX
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 
 VulkanTest: *.c *.h
