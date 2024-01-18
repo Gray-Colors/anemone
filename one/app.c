@@ -1,7 +1,7 @@
-#include "app.h"
-#include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
+#include "anemoneclib.h"
+#include "app.h"
 // Internal functions
 void initWindow(application_data *data) {
   glfwInit();
@@ -65,12 +65,22 @@ throw std::runtime_error("failed to create instance!");
 }
 */
 
+  // To get just the extension count, the third (/last) parameter can be left
+  // away
+  uint32_t extensionCount = 0;
+  vkEnumerateInstanceExtensionProperties(0 /*nullptr*/, &extensionCount,
+                                         0 /*nullptr*/);
+  std::vector<VkExtensionProperties> extensions(extensionCount);
 
-// To get just the extension count, the third (/last) parameter can be left away
+  VkExtensionProperties *extensions;
+  VkExtensionProperties t;
 
-//    uint32_t extensionCount = 0;
-//vkEnumerateInstanceExtensionProperties(0 /*nullptr*/, &extensionCount, 0 /*nullptr*/);
-//std::vector<VkExtensionProperties> extensions(extensionCount);
+  extensions = vec_malloc(8 + (20 * sizeof(VkExtensionProperties))) + 8;
+  *(extensions - 4) = 20;
+  *(extensions - 8) = 20;
+      // vec_init_size(extensions, sizeof(t), extensionCount);
+
+      vec_add(vec_ptr, element);
 
   VkResult result =
       vkCreateInstance(&createInfo, 0 /*nullptr*/, &(data->instance));

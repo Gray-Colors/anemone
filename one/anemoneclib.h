@@ -51,12 +51,19 @@ typedef struct vec_data {
   // cvector_elem_destructor_t elem_destructor;
 } vec_data;
 
-#define vec_init(ptr, type_t)                                                  \
-  (type_t *)vec_malloc(8 /*reserved for pointer for vec_data*/ +               \
-                       (20 * sizeof(type_t))) +                                \
+#define vec_init(ptr, type_size /*previously type_t, but some errors there*/)  \
+  (void *)vec_malloc(8 /*reserved for pointer for vec_data*/ +                 \
+                     (20 * type_size /*sizeof(type_t)*/)) +                    \
       8;                                                                       \
   *(ptr - 4) = 20;                                                             \
   *(ptr - 8) = 20
+
+#define vec_init_size(ptr, type_size /*type_t*/, size)                         \
+  (void *)vec_malloc(8 /*reserved for pointer for vec_data*/ +                 \
+                     (size * type_size /*sizeof(type_t)*/)) +                  \
+      8;                                                                       \
+  *(ptr - 4) = size;                                                           \
+  *(ptr - 8) = size
 
 // consider moving the code in the if into a function
 #define vec_add(vec_ptr, element)                                              \
@@ -69,3 +76,13 @@ typedef struct vec_data {
   vec_ptr[*(vec_ptr - 4) - *(vec_ptr - 8)--] =                                 \
       element; // If the compiler isn't dumb, replace "--" with a new line
                // containing
+
+// With this code, popping from an "empty" vec will will increase capacity
+// beyond size. This 'should' cause a segfault, but the first 8 bytes under the
+// array are used to store its size and capacity, so as long as (size -
+// capacity)*sizeof(type) < -8 bytes, you'll just get some really weird values
+#define vec_pop(vec_ptr) vec_ptr[*(vec_ptr - 4) - *(vec_ptr - 8)++]
+
+// #define vec_shrink()
+
+#define free_vec(vec_ptr) vec_free(vec_ptr)
